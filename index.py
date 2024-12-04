@@ -10,15 +10,23 @@ from button import Button
 pygame.mixer.pre_init(44100,16,1,512)
 pygame.init()  # Begin pygame
  
+BG = pygame.image.load("assets/Background.png")
+pygame.display.set_caption("Menu")
+
+
+def get_font(size): # Returns Press-Start-2P in the desired size
+    return pygame.font.Font("assets/font.ttf", size)
+
 # Declaring variables to be used through the program
 vec = pygame.math.Vector2
-HEIGHT = 350
-WIDTH = 700
+HEIGHT = 720
+WIDTH = 1280
 ACC = 0.3
 FRIC = -0.10
 FPS = 60
 FPS_CLOCK = pygame.time.Clock()
 COUNT = 0
+PLAY_MOUSE_POS = pygame.mouse.get_pos()
 
 #music and sound
 soundtrack = 'assets/Music/mixkit-island-beat-250.mp3'
@@ -31,6 +39,7 @@ milksound = pygame.mixer.Sound("assets/Music/milksound.mp3")
  
 mmanager = MusicManager()
 mmanager.playsoundtrack(soundtrack, -1, 0.05)
+ 
 
 #fonts
 headingfont = pygame.font.SysFont("Verdana", 40)
@@ -95,7 +104,7 @@ class Cursor(pygame.sprite.Sprite):
             else:
              self.wait = 1      
       def hover(self):
-            if 620 <= mouse[0] <= 670 and 300 <= mouse[1] <= 345:
+            if 620 <= PLAY_MOUSE_POS[0] <= 670 and 300 <= PLAY_MOUSE_POS[1] <= 345:
              pygame.mouse.set_visible(False)
              cursor.rect.center = pygame.mouse.get_pos()  # update position 
              displaysurface.blit(cursor.image, cursor.rect)
@@ -583,7 +592,6 @@ class EventHandler():
             self.dead_enemy_count = 0 
             pygame.time.set_timer(self.enemy_generation, 1500 - (50 * self.stage))
             mmanager.playsoundtrack(hippobattletrack, -1, 0.05)
-                                 
 #declaring images and sprite groups
 Enemies = pygame.sprite.Group()
 background = Background()
@@ -603,17 +611,84 @@ status_bar= StatusBar()
 hit_cooldown = pygame.USEREVENT + 1
 stage_display = StageDisplay()
 Items = pygame.sprite.Group()
-GAME_RUNNING = 1
+
 Death_knell_time = None
-DEATH_KNELL_DELAY = 20000
+DEATH_KNELL_DELAY = 20000                                
+#main menu loop
+def main_menu():
+    while True:
+        displaysurface.blit(BG, (0, 0))
 
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
 
+        MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
+        MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
+
+        PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 250), 
+                            text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 400), 
+                            text_input="OPTIONS", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(640, 550), 
+                            text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+
+        displaysurface.blit(MENU_TEXT, MENU_RECT)
+
+        for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(displaysurface)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    play()
+                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    options()
+                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    pygame.quit()
+                    sys.exit()
+
+        pygame.display.update()
+
+#options menu loop
+def options():
+    while True:
+        OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+
+        displaysurface.fill("white")
+
+        OPTIONS_TEXT = get_font(45).render("This is the OPTIONS Screen, although you have no options do you...", True, "Black")
+        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(640, 260))
+        displaysurface.blit(OPTIONS_TEXT, OPTIONS_RECT)
+
+        OPTIONS_BACK = Button(image=None, pos=(640, 460), 
+                            text_input="BACK", font=get_font(75), base_color="Black", hovering_color="Green")
+
+        OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_BACK.update(displaysurface)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                    main_menu()
+
+        pygame.display.update()
 #game looop
-while GAME_RUNNING:
-    moodeng.gravity_check()   
-    mouse = pygame.mouse.get_pos()
+def play():
+  while True:
+      PLAY_MOUSE_POS = pygame.mouse.get_pos()
+
+      displaysurface.fill("black")
+
+      moodeng.gravity_check()   
+      
     
-    for event in pygame.event.get():
+      for event in pygame.event.get():
         # Will run when the close window button is clicked    
         if event.type == QUIT:
             pygame.quit()
@@ -627,7 +702,7 @@ while GAME_RUNNING:
              
         # For events that occur upon clicking the mouse (left click) 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if 620 <= mouse[0] <= 670 and 300 <= mouse[1] <= 345:
+            if 620 <= PLAY_MOUSE_POS[0] <= 670 and 300 <= PLAY_MOUSE_POS[1] <= 345:
                   if button.imgdisp == 1:
                         cursor.pause()
                   elif button.imgdisp == 0:
@@ -663,52 +738,53 @@ while GAME_RUNNING:
              moodeng.cooldown = False
              pygame.time.set_timer(hit_cooldown, 0)   
                      
-    moodeng.update()
-    if moodeng.attacking == 1:
+      moodeng.update()
+      if moodeng.attacking == 1:
         moodeng.attack()
-    moodeng.move()    
+      moodeng.move()    
     # Render Functions ------
-    background.render() 
-    ground.render()
-    arena.update()
-    button.render(button.imgdisp)
-    cursor.hover()
+      background.render() 
+      ground.render()
+      arena.update()
+      button.render(button.imgdisp)
+      cursor.hover()
     # Render stage display
-    if stage_display.display == 1:
+      if stage_display.display == 1:
           stage_display.move_display()
-    if stage_display.clear == 1:
+      if stage_display.clear == 1:
           stage_display.stage_clear()
     #must render player and enemies after background and ground
-    if moodeng.health > 0:
-      displaysurface.blit(moodeng.image, moodeng.rect)
-    health.render()
+      if moodeng.health > 0:
+            displaysurface.blit(moodeng.image, moodeng.rect)
+      health.render()
     
     #fireballs
-    for ball in Fireballs:
-      ball.fire()
+      for ball in Fireballs:
+            ball.fire()
       
-    for entity in Enemies:
+      for entity in Enemies:
           entity.update()
           entity.move()
           entity.render()
           
       #render items
-    for i in Items:
-      i.render()
-      i.update()
+      for i in Items:
+            i.render()
+            i.update()
       
-    if moodeng.health == 0:
+      if moodeng.health == 0:
           stage_display.moodeng_death_knell()
           if Death_knell_time is None:   
             Death_knell_time = pygame.time.get_ticks()
-    if Death_knell_time is not None:
+      if Death_knell_time is not None:
           current_time = pygame.time.get_ticks()
           if current_time - Death_knell_time >= DEATH_KNELL_DELAY:
                 GAME_RUNNING = False
       # Status bar update and render
-    displaysurface.blit(status_bar.surf, (580, 5))
-    status_bar.update_draw()
-    handler.update()
+      displaysurface.blit(status_bar.surf, (580, 5))
+      status_bar.update_draw()
+      handler.update()
     
-    pygame.display.flip() 
-    FPS_CLOCK.tick(FPS)
+      pygame.display.flip() 
+      FPS_CLOCK.tick(FPS)
+main_menu()
