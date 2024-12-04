@@ -20,6 +20,7 @@ FPS = 60
 FPS_CLOCK = pygame.time.Clock()
 COUNT = 0
 
+
 #music and sound
 soundtrack = 'assets/Music/mixkit-island-beat-250.mp3'
 hippobattletrack = 'assets/Music/Battlemusic.mp3'
@@ -82,6 +83,7 @@ run_ani_L = [pygame.image.load("assets/moodeng_L_1.xcf").convert_alpha(), pygame
              pygame.image.load("assets/moodeng_L_3.xcf").convert_alpha(),pygame.image.load("assets/moodeng_L_4.xcf").convert_alpha(),
              pygame.image.load("assets/moodeng_L_5.xcf").convert_alpha(),pygame.image.load("assets/moodeng_L_6.xcf").convert_alpha(),
              pygame.image.load("assets/moodeng_L_1.xcf").convert_alpha()]
+
 
 class Cursor(pygame.sprite.Sprite):
       def __init__(self):
@@ -627,6 +629,7 @@ while GAME_RUNNING:
              
         # For events that occur upon clicking the mouse (left click) 
         if event.type == pygame.MOUSEBUTTONDOWN:
+           
             if 620 <= mouse[0] <= 670 and 300 <= mouse[1] <= 345:
                   if button.imgdisp == 1:
                         cursor.pause()
@@ -662,6 +665,7 @@ while GAME_RUNNING:
         if event.type == hit_cooldown:
              moodeng.cooldown = False
              pygame.time.set_timer(hit_cooldown, 0)   
+    
                      
     moodeng.update()
     if moodeng.attacking == 1:
