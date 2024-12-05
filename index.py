@@ -3,7 +3,7 @@ from pygame.locals import *
 import sys
 import random
 from music_manager import MusicManager
-from button import Button 
+
 
 
 
@@ -21,8 +21,8 @@ FPS_CLOCK = pygame.time.Clock()
 COUNT = 0
 
 #music and sound
-soundtrack = 'assets/Music/mixkit-island-beat-250.mp3'
-hippobattletrack = 'assets/Music/Battlemusic.mp3'
+soundtrack = 'assets/Music/MoodengReggae.mp3'
+hippobattletrack = 'assets/Music/moodengmoodengChinese.mp3'
 fsound = [pygame.mixer.Sound("assets/Music/hungryhippo.mp3"),pygame.mixer.Sound("assets/Music/hungryhippo.mp3")]
 wsound = pygame.mixer.Sound("assets/Music/fireball.mp3")
 hit = pygame.mixer.Sound("assets/Music/deathsound.mp3")
@@ -83,6 +83,57 @@ run_ani_L = [pygame.image.load("assets/moodeng_L_1.xcf").convert_alpha(), pygame
              pygame.image.load("assets/moodeng_L_5.xcf").convert_alpha(),pygame.image.load("assets/moodeng_L_6.xcf").convert_alpha(),
              pygame.image.load("assets/moodeng_L_1.xcf").convert_alpha()]
 
+pocket_monsters = [
+              pygame.image.load("assets/Enemies/PurrInBoots.xcf"),
+              pygame.image.load("assets/Enemies/ALAKAZAM.xcf"),
+              pygame.image.load("assets/Enemies/Babe.xcf"),
+              pygame.image.load("assets/Enemies/Giraffe.xcf"),
+              pygame.image.load("assets/Enemies/GOLDY.xcf"),
+              pygame.image.load("assets/Enemies/LAva.xcf"),
+              pygame.image.load("assets/Enemies/Manta.xcf"),
+              pygame.image.load("assets/Enemies/MRMIME.xcf"),
+              pygame.image.load("assets/Enemies/MRMIMESS.xcf"),
+              pygame.image.load("assets/Enemies/PINKY.xcf"),
+              pygame.image.load("assets/Enemies/Rusty.xcf"),
+              pygame.image.load("assets/Enemies/SCARYMIME.xcf"),
+              pygame.image.load("assets/Enemies/SexySnorlax.xcf"),
+              pygame.image.load("assets/Enemies/THEGUY.xcf"),
+              pygame.image.load("assets/Enemies/TIRE.xcf"),
+              ]
+pocket_monstersR = [
+    pygame.image.load("assets/Enemies/PurrInBootsR.xcf"),
+    pygame.image.load("assets/Enemies/ALAKAZAMR.xcf"),
+    pygame.image.load("assets/Enemies/BabeR.xcf"),
+    pygame.image.load("assets/Enemies/GiraffeR.xcf"),
+    pygame.image.load("assets/Enemies/GOLDYR.xcf"),
+    pygame.image.load("assets/Enemies/LAvaR.xcf"),
+    pygame.image.load("assets/Enemies/MantaR.xcf"),
+    pygame.image.load("assets/Enemies/MRMIMER.xcf"),
+    pygame.image.load("assets/Enemies/MRMIMESSR.xcf"),
+    pygame.image.load("assets/Enemies/PINKYR.xcf"),
+    pygame.image.load("assets/Enemies/RustyR.xcf"),
+    pygame.image.load("assets/Enemies/SCARYMIMER.xcf"),
+    pygame.image.load("assets/Enemies/SexySnorlaxR.xcf"),
+    pygame.image.load("assets/Enemies/THEGUYR.xcf"),
+    pygame.image.load("assets/Enemies/TIRER.xcf"),
+]            
+
+class PButton(pygame.sprite.Sprite):
+      def __init__(self):
+            super().__init__()
+            self.vec = vec(620, 300)
+            self.imgdisp = 0
+            
+      def render(self, num):
+            if (num == 0):
+                  self.image = pygame.image.load("assets/home_small.png")
+            elif (num == 1):
+                  if cursor.wait == 0:
+                        self.image = pygame.image.load("assets/pause_small.png")
+                  else:
+                        self.image = pygame.image.load("assets/play_small.png")             
+            displaysurface.blit(self.image, self.vec)    
+
 class Cursor(pygame.sprite.Sprite):
       def __init__(self):
             super().__init__()
@@ -104,23 +155,7 @@ class Cursor(pygame.sprite.Sprite):
      
       def update (self):
             if cursor.wait == 1:
-                  return 
-
-class PButton(pygame.sprite.Sprite):
-      def __init__(self):
-            super().__init__()
-            self.vec = vec(620, 300)
-            self.imgdisp = 0
-            
-      def render(self, num):
-            if (num == 0):
-                  self.image = pygame.image.load("assets/home_small.png")
-            elif (num == 1):
-                  if cursor.wait == 0:
-                        self.image = pygame.image.load("assets/pause_small.png")
-                  else:
-                        self.image = pygame.image.load("assets/play_small.png")             
-            displaysurface.blit(self.image, self.vec)      
+                  return    
             
 class Background(pygame.sprite.Sprite):
       def __init__(self):
@@ -244,7 +279,7 @@ class Item(pygame.sprite.Sprite):
       def __init__(self, itemtype):
             super().__init__()
             if itemtype == 1: self.image = pygame.image.load("assets/heart.png")
-            elif itemtype == 2: self.image = pygame.image.load("assets/milk.xcf")
+            elif itemtype == 2: self.image = pygame.image.load("assets/lonlonmilk.xcf")
             self.rect = self.image.get_rect()
             self.type = itemtype
             self.posx = 0
@@ -262,7 +297,10 @@ class Item(pygame.sprite.Sprite):
                         moodeng.health += 1
                         health.image = health_ani[moodeng.health]
                         self.kill()
+                  if moodeng.health >= 5 and self.type == 1:
+                        self.kill()
                   if self.type == 2:
+                        if moodeng.mana <100: moodeng.mana += 1
                   # handler.money += 1
                   #commented out until we create  money systep
                         self.kill()
@@ -423,35 +461,61 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
       def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("assets/PurrInBoots.xcf")
+        if handler.dead_enemies<30: 
+            self.image =  random.choice(pocket_monsters)
+        elif handler.dead_enemies >= 30:
+            self.image = pygame.image.load("assets/Enemies/Knee.xcf")
+            handler.dead_enemies=0
+            
         self.rect = self.image.get_rect()     
         self.pos = vec(0,0)
         self.vel = vec(0,0)
         
+        
         #randomize enemies
         self.direction = random.randint(0,1) # 0 for Right, 1 for Left
         self.vel.x = random.randint(2,6) / 2  # Randomized velocity of the generated enemy
+        
+        self.mana = random.randint(1, 2)  # Randomised mana amount obtained upon kill
+        
         # Sets the intial position of the enemy (direction of movement determines spawn point)
-        self.mana = random.randint(1, 3)  # Randomised mana amount obtained upon kill
         if self.direction == 0:
             self.pos.x = 0
             self.pos.y = 235
-        if self.direction == 1:
+        elif self.direction == 1:
             self.pos.x = 700
             self.pos.y = 235  
-                 
+            
+        self.last_direction = self.direction
+        self.update_image()
+        
+      def update_image(self):
+           if self.image == pygame.image.load("assets/Enemies/Knee.xcf"):
+                  if self.direction == 0:  # Facing right
+                        self.image = pygame.image.load("assets/Enemies/KneeR.xcf")
+                  elif self.direction == 1:  # Facing left
+                        self.image = pygame.image.load("assets/Enemies/Knee.xcf")
+           elif self.direction == 0:  # Facing right
+                  self.image = random.choice(pocket_monstersR)
+           elif self.direction == 1:  # Facing left
+                  self.image = random.choice(pocket_monsters)
       def move(self):
         if cursor.wait == 1 : 
               return
   # Causes the enemy to change directions upon reaching the end of screen    
         if self.pos.x >= (WIDTH-20):
-          self.direction = 1
+          if self.direction != 1: #only change if not already left
+            self.direction = 1
+            self.update_image()
         elif self.pos.x <= 0:
-          self.direction = 0  
+              if self.direction != 0:
+                  self.direction = 0 #turn to face right
+                  self.update_image()
+                    
           #updates position \/
-        if self.direction == 0:
+        if self.direction == 0: #move right
           self.pos.x += self.vel.x
-        if self.direction == 1:
+        if self.direction == 1: #move left
           self.pos.x -= self.vel.x
  
         self.rect.center = self.pos # Updates rect
@@ -473,12 +537,13 @@ class Enemy(pygame.sprite.Sprite):
                   moodeng.experience += 1   # Release expeiriance
                   # if moodeng.health < 5: moodeng.health += 1
                   handler.dead_enemy_count += 1 
+                  handler.dead_enemies += 1
             #print("Enemy killed")
                   rand_num = random.randint(0, 100)
                   item_no = 0
-                  if rand_num >= 0 and rand_num <= 20:  # 1 / 20 chance for an item (health) drop
+                  if rand_num >= 0 and rand_num <= 15:  
                         item_no = 1
-                  elif rand_num > 20 and rand_num <= 50:
+                  elif rand_num > 15 and rand_num <= 50:
                         item_no = 2
                   if item_no != 0:
       # Add Item to Items group
@@ -496,10 +561,12 @@ class Arena(pygame.sprite.Sprite):
             super().__init__()
             self.hide = False
             self.image = pygame.image.load("assets/blackhole2.xcf")
+            self.instruction = pygame.image.load("assets/SIgnpost.xcf")
             self.rect = self.image.get_rect()
  
       def update(self):
             if not self.hide:
+                  displaysurface.blit(self.instruction, (100, 60)) 
                   displaysurface.blit(self.image, (500, 200)) 
            
                
@@ -511,29 +578,16 @@ class EventHandler():
             self.battle = False
             self.enemy_generation = pygame.USEREVENT + 2
             self.stage = 1
+            self.dead_enemies = 0 
             
            
             
             self.stage_enemies = []
             for x in range(1,21):
                   self.stage_enemies.append(int((x**2/2)+1)) 
-      # def stage_handler(self):
-      #       # Code for the Tkinter stage selection window
-      #       self.root = Tk()
-      #       self.root.geometry('200x170')
-             
-      #       button1 = Button(self.root, text = "Baby Weight Wrestling Arena", width = 18, height = 2,
-      #                       command = self.world1)
-      #       button2 = Button(self.root, text = "Bubble Weight Wrestling Arena", width = 18, height = 2,
-      #                       command = self.world2)
-      #       button3 = Button(self.root, text = "World Championship Arena for Big Girl Hippos", width = 18, height = 2,
-      #                       command = self.world3)
-              
-      #       button1.place(x = 40, y = 15)
-      #       button2.place(x = 40, y = 65)
-      #       button3.place(x = 40, y = 115)
-             
-      #       self.root.mainloop()  
+            for x in range(21,100):
+                  self.stage_enemies.append(int((x**2/2)+1))
+    
       def home(self):
       # Reset Battle code
             pygame.time.set_timer(self.enemy_generation, 0)
@@ -564,9 +618,9 @@ class EventHandler():
             button.imgdisp = 1 
             arena.hide = True
             self.battle = 1
+            mmanager.playsoundtrack(hippobattletrack, -1, 0.05)
  
       def world2(self):
-            self.root.destroy()
             self.battle = 1
             button.imgdisp = 1 
       # Empty for now
@@ -582,7 +636,7 @@ class EventHandler():
             self.enemy_count = 0
             self.dead_enemy_count = 0 
             pygame.time.set_timer(self.enemy_generation, 1500 - (50 * self.stage))
-            mmanager.playsoundtrack(hippobattletrack, -1, 0.05)
+            
                                  
 #declaring images and sprite groups
 Enemies = pygame.sprite.Group()
@@ -605,7 +659,7 @@ stage_display = StageDisplay()
 Items = pygame.sprite.Group()
 GAME_RUNNING = 1
 Death_knell_time = None
-DEATH_KNELL_DELAY = 20000
+DEATH_KNELL_DELAY = 10000
 
 
 #game looop
