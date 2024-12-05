@@ -17,11 +17,11 @@ python -i index.py
 
 ## Controls
 
-Arrow Keys -> Move Moodeng 
-Spacebar -> Jump
-Mouse Left Click ->  to select home or pause button
-E -> enter the wormhole
-N -> Next Level 
+Arrow Keys -> Move Moodeng \
+Spacebar -> Jump\
+Mouse Left Click ->  to select home or pause button\
+E -> enter the wormhole\
+N -> Next Level \
 Return/Enter -> Bubblebeam
 
 ## Built With
