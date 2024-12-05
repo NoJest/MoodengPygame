@@ -22,7 +22,8 @@ Spacebar -> Jump\
 Mouse Left Click ->  to select home or pause button\
 E -> enter the wormhole\
 N -> Next Level \
-Return/Enter -> Bubblebeam
+M -> Bubblebeam \
+Return/ Enter -> Attack
 
 ## Built With
 
